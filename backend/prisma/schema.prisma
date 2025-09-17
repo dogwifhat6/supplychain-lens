@@ -1,0 +1,355 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  company   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  organizations OrganizationUser[]
+  alerts        Alert[]
+  reports       Report[]
+  sessions      UserSession[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+// Organization Management
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  industry    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users           OrganizationUser[]
+  suppliers       Supplier[]
+  monitoringZones MonitoringZone[]
+  alerts          Alert[]
+  reports         Report[]
+
+  @@map("organizations")
+}
+
+model OrganizationUser {
+  id             String           @id @default(cuid())
+  userId         String
+  organizationId String
+  role           OrganizationRole @default(MEMBER)
+  joinedAt       DateTime         @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@map("organization_users")
+}
+
+// Supplier Management
+model Supplier {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  country        String
+  industry       String?
+  coordinates    Json?    // { lat: number, lng: number }
+  riskLevel      RiskLevel @default(LOW)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  concessions     Concession[]
+  satelliteData   SatelliteData[]
+  riskAssessments RiskAssessment[]
+  alerts          Alert[]
+
+  @@map("suppliers")
+}
+
+model Concession {
+  id         String   @id @default(cuid())
+  supplierId String
+  name       String
+  area       Float    // in hectares
+  boundaries Json     // GeoJSON polygon
+  type       ConcessionType
+  status     ConcessionStatus @default(ACTIVE)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@map("concessions")
+}
+
+// Satellite Data Management
+model SatelliteData {
+  id          String   @id @default(cuid())
+  supplierId  String
+  imageId     String   @unique
+  source      SatelliteSource
+  resolution  Float    // in meters
+  cloudCover  Float    // percentage
+  coordinates Json     // { lat: number, lng: number }
+  bounds      Json     // GeoJSON bounding box
+  imageUrl    String
+  metadata    Json     // Additional satellite metadata
+  processedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@map("satellite_data")
+}
+
+// Monitoring Zones
+model MonitoringZone {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  boundaries     Json     // GeoJSON polygon
+  priority       ZonePriority @default(MEDIUM)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("monitoring_zones")
+}
+
+// Risk Assessment
+model RiskAssessment {
+  id         String   @id @default(cuid())
+  supplierId String
+  type       RiskType
+  score      Float    // 0-100
+  confidence Float    // 0-100
+  factors    Json     // Risk factors and their weights
+  details    Json     // Detailed assessment data
+  assessedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@map("risk_assessments")
+}
+
+// Detection Results
+model Detection {
+  id          String        @id @default(cuid())
+  type        DetectionType
+  confidence  Float         // 0-100
+  coordinates Json          // { lat: number, lng: number }
+  area        Float?        // in hectares
+  metadata    Json          // Detection-specific data
+  imageUrl    String?
+  processedAt DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+
+  @@map("detections")
+}
+
+// Alerts and Notifications
+model Alert {
+  id             String      @id @default(cuid())
+  userId         String?
+  organizationId String?
+  supplierId     String?
+  type           AlertType
+  severity       AlertSeverity
+  title          String
+  message        String
+  data           Json?       // Additional alert data
+  isRead         Boolean     @default(false)
+  isResolved     Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  resolvedAt     DateTime?
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  @@map("alerts")
+}
+
+// Reports
+model Report {
+  id             String      @id @default(cuid())
+  userId         String
+  organizationId String?
+  type           ReportType
+  title          String
+  content        Json        // Report data structure
+  status         ReportStatus @default(DRAFT)
+  generatedAt    DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@map("reports")
+}
+
+// Job Queue
+model Job {
+  id        String   @id @default(cuid())
+  type      String
+  data      Json
+  status    JobStatus @default(PENDING)
+  priority  Int      @default(0)
+  attempts  Int      @default(0)
+  maxAttempts Int    @default(3)
+  error     String?
+  createdAt DateTime @default(now())
+  startedAt DateTime?
+  completedAt DateTime?
+
+  @@map("jobs")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  USER
+  VIEWER
+}
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ConcessionType {
+  MINING
+  FORESTRY
+  AGRICULTURE
+  INDUSTRIAL
+  OTHER
+}
+
+enum ConcessionStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+enum SatelliteSource {
+  SENTINEL_2
+  LANDSAT_8
+  LANDSAT_9
+  PLANET
+  SPOT
+  OTHER
+}
+
+enum ZonePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RiskType {
+  DEFORESTATION
+  ILLEGAL_MINING
+  LAND_USE_CHANGE
+  ENVIRONMENTAL_DAMAGE
+  COMPLIANCE_VIOLATION
+  SUPPLY_CHAIN_DISRUPTION
+}
+
+enum DetectionType {
+  FOREST_LOSS
+  MINING_ACTIVITY
+  CONSTRUCTION
+  AGRICULTURAL_EXPANSION
+  INFRASTRUCTURE_DEVELOPMENT
+  FIRE_DAMAGE
+  FLOODING
+  OTHER
+}
+
+enum AlertType {
+  RISK_THRESHOLD_EXCEEDED
+  NEW_DETECTION
+  SUPPLIER_UPDATE
+  SYSTEM_NOTIFICATION
+  COMPLIANCE_ALERT
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportType {
+  MONTHLY_SUMMARY
+  RISK_ASSESSMENT
+  COMPLIANCE_REPORT
+  CUSTOM_ANALYSIS
+  ESG_REPORT
+}
+
+enum ReportStatus {
+  DRAFT
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}

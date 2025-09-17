@@ -1,73 +1,161 @@
-# Welcome to your Lovable project
+# SupplyChainLens
 
-## Project info
+A comprehensive satellite-powered ESG monitoring platform for supply chains, built with React, Node.js, PostgreSQL, and advanced ML capabilities.
 
-**URL**: https://lovable.dev/projects/86885001-7586-4071-9201-a31a72da7818
+## Overview
 
-## How can I edit this code?
+SupplyChainLens is an enterprise-grade platform that uses satellite imagery and machine learning to monitor environmental, social, and governance (ESG) risks in global supply chains. The platform provides real-time monitoring, risk assessment, and compliance reporting for organizations managing complex supply networks.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Satellite Image Processing**: Advanced ML models for deforestation and mining detection
+- **Real-time Risk Assessment**: Comprehensive ESG risk scoring and monitoring
+- **Supply Chain Monitoring**: Track suppliers and their environmental impact
+- **Geospatial Analysis**: Location-based risk analysis and protected area monitoring
+- **Dashboard & Analytics**: Interactive dashboards with real-time data visualization
+- **Alert System**: Automated notifications for high-risk activities
+- **Multi-tenant Architecture**: Organization-based data isolation and management
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/86885001-7586-4071-9201-a31a72da7818) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- shadcn/ui component library
+- React Query for data fetching
+- Recharts for data visualization
 
-**Use your preferred IDE**
+### Backend
+- Node.js with Express and TypeScript
+- PostgreSQL with Prisma ORM
+- Redis for caching and job queues
+- JWT authentication
+- WebSocket support with Socket.IO
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### ML Pipeline
+- Python with FastAPI
+- PyTorch for deep learning models
+- Computer vision and geospatial analysis
+- CUDA support for GPU acceleration
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Quick Start
 
-Follow these steps:
+### Prerequisites
+- Docker 20.10+ and Docker Compose 2.0+ (Recommended)
+- OR Node.js 18+, Python 3.9+, PostgreSQL 15+, Redis 7+
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### One-Command Deployment (Recommended)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+# Clone and deploy in one command
+git clone <repository-url>
+cd supplychain-lens
+chmod +x scripts/*.sh
+./scripts/quick-deploy.sh
 ```
 
-**Edit a file directly in GitHub**
+### Manual Installation
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd supplychain-lens
+   ```
 
-**Use GitHub Codespaces**
+2. **Run the setup script:**
+   ```bash
+   ./setup.sh
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Or use Docker:**
+   ```bash
+   docker-compose up -d
+   ```
 
-## What technologies are used for this project?
+### Production Deployment
 
-This project is built with:
+```bash
+# Deploy to production
+./scripts/quick-deploy.sh production
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+# Or use the full deployment script
+./scripts/deploy.sh
+```
 
-## How can I deploy this project?
+### Online Deployment (Make it Live!)
 
-Simply open [Lovable](https://lovable.dev/projects/86885001-7586-4071-9201-a31a72da7818) and click on Share -> Publish.
+```bash
+# Interactive deployment to cloud platforms
+./scripts/deploy-online.sh
 
-## Can I connect a custom domain to my Lovable project?
+# Quick deployment options:
+# - Railway (easiest)
+# - Render (free tier)
+# - DigitalOcean (VPS)
+# - AWS EC2 (enterprise)
+# - Google Cloud Run (serverless)
+```
 
-Yes, you can!
+**📖 [Quick Deploy Guide](QUICK-DEPLOY.md) - Get online in 10 minutes!**
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Development
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+1. **Frontend development:**
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+2. **Backend development:**
+   ```bash
+   cd backend
+   npm install
+   npm run dev
+   ```
+
+3. **ML service development:**
+   ```bash
+   cd ml-service
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   python -m uvicorn app.main:app --reload
+   ```
+
+## Access Points
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3001
+- **ML Service**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+## Default Credentials
+
+After running the seed script:
+- **Admin**: admin@supplychainlens.com / admin123
+- **Demo User**: demo@supplychainlens.com / demo123
+
+## Project Structure
+
+```
+supplychain-lens/
+├── src/                    # Frontend React application
+├── backend/                # Backend Node.js API
+├── ml-service/             # ML pipeline service
+├── docker-compose.yml      # Docker services
+├── nginx.conf             # Nginx configuration
+└── setup.sh               # Setup script
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
