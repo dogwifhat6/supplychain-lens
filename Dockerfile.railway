@@ -1,15 +1,5 @@
-# Multi-stage production build
-FROM node:18-alpine AS frontend-builder
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-# Backend production image
-FROM node:18-alpine AS backend
+# Railway-optimized Dockerfile
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -17,17 +7,34 @@ WORKDIR /app
 RUN apk add --no-cache \
     postgresql-client \
     curl \
+    python3 \
+    py3-pip \
+    build-base \
     && rm -rf /var/cache/apk/*
 
 # Copy package files
-COPY backend/package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+COPY package*.json ./
+COPY backend/package*.json ./backend/
 
-# Copy backend source
-COPY backend/ ./
+# Install frontend dependencies
+RUN npm ci
 
-# Copy built frontend
-COPY --from=frontend-builder /app/dist ./public
+# Install backend dependencies
+WORKDIR /app/backend
+RUN npm ci --only=production
+
+# Copy source code
+WORKDIR /app
+COPY . .
+
+# Build frontend
+RUN npm run build
+
+# Copy built frontend to backend public directory
+RUN cp -r dist/* backend/public/
+
+# Set working directory to backend
+WORKDIR /app/backend
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
