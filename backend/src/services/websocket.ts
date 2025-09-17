@@ -1,4 +1,4 @@
-import { Server as SocketIOServer } from 'socket.io';
+import { Server as SocketIOServer, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { getPrismaClient } from './database';
 import { logger } from '../utils/logger';
@@ -83,12 +83,12 @@ export const initializeWebSocket = (io: SocketIOServer): void => {
     });
 
     // Handle disconnection
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: string) => {
       logger.info(`User disconnected: ${socket.userId}, reason: ${reason}`);
     });
 
     // Handle errors
-    socket.on('error', (error) => {
+    socket.on('error', (error: Error) => {
       logger.error(`WebSocket error for user ${socket.userId}:`, error);
     });
   });
