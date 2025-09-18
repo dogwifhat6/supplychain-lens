@@ -33,6 +33,13 @@ import { initializeWebSocket } from './services/websocket';
 // Load environment variables
 dotenv.config();
 
+// Set default environment variables for Railway
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+process.env.PORT = process.env.PORT || '3000';
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-change-in-production';
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/supplychain_lens';
+process.env.REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+
 const app = express();
 const server = createServer(app);
 const io = new SocketIOServer(server, {
@@ -42,7 +49,7 @@ const io = new SocketIOServer(server, {
   }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(helmet({
@@ -119,21 +126,37 @@ async function initializeApp() {
   try {
     logger.info('Initializing SupplyChainLens Backend...');
     
-    // Initialize database
-    await initializeDatabase();
-    logger.info('Database initialized successfully');
+    // Initialize database (optional)
+    try {
+      await initializeDatabase();
+      logger.info('Database initialized successfully');
+    } catch (error) {
+      logger.warn('Database initialization failed, continuing without database:', error);
+    }
     
-    // Initialize Redis
-    await initializeRedis();
-    logger.info('Redis initialized successfully');
+    // Initialize Redis (optional)
+    try {
+      await initializeRedis();
+      logger.info('Redis initialized successfully');
+    } catch (error) {
+      logger.warn('Redis initialization failed, continuing without Redis:', error);
+    }
     
-    // Initialize job queue
-    await initializeJobQueue();
-    logger.info('Job queue initialized successfully');
+    // Initialize job queue (optional)
+    try {
+      await initializeJobQueue();
+      logger.info('Job queue initialized successfully');
+    } catch (error) {
+      logger.warn('Job queue initialization failed, continuing without job queue:', error);
+    }
     
-    // Initialize WebSocket
-    initializeWebSocket(io);
-    logger.info('WebSocket initialized successfully');
+    // Initialize WebSocket (optional)
+    try {
+      initializeWebSocket(io);
+      logger.info('WebSocket initialized successfully');
+    } catch (error) {
+      logger.warn('WebSocket initialization failed, continuing without WebSocket:', error);
+    }
     
     // Start server
     server.listen(PORT, () => {
