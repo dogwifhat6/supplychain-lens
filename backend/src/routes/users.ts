@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { getPrismaClient } from '../services/database';
 import { authenticateToken, requireRole, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
@@ -6,7 +6,7 @@ import { asyncHandler } from '../middleware/errorHandler';
 const router = express.Router();
 
 // Get user profile
-router.get('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
@@ -47,7 +47,7 @@ router.get('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, 
 }));
 
 // Update user profile
-router.put('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.put('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
   const { firstName, lastName, company } = req.body;
@@ -79,7 +79,7 @@ router.put('/profile', authenticateToken, asyncHandler(async (req: AuthRequest, 
 }));
 
 // Get all users (admin only)
-router.get('/', authenticateToken, requireRole(['ADMIN']), asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, requireRole(['ADMIN']), asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const { page = 1, limit = 10, search = '' } = req.query;
 

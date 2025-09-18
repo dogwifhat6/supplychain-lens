@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { getPrismaClient } from '../services/database';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
@@ -40,7 +40,7 @@ router.post('/', authenticateToken, [
 }));
 
 // Get suppliers
-router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
   const { organizationId, page = 1, limit = 10 } = req.query;
