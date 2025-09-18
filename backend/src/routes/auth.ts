@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
@@ -24,7 +24,7 @@ const loginValidation = [
 ];
 
 // Register new user
-router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHandler(async (req, res) => {
+router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHandler(async (req, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -100,7 +100,7 @@ router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHan
 }));
 
 // Login user
-router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(async (req, res) => {
+router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(async (req, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -181,7 +181,7 @@ router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(a
 }));
 
 // Logout user
-router.post('/logout', asyncHandler(async (req, res) => {
+router.post('/logout', asyncHandler(async (req, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (token) {
@@ -200,7 +200,7 @@ router.post('/logout', asyncHandler(async (req, res) => {
 }));
 
 // Get current user
-router.get('/me', asyncHandler(async (req, res) => {
+router.get('/me', asyncHandler(async (req, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (!token) {
@@ -248,7 +248,7 @@ router.get('/me', asyncHandler(async (req, res) => {
 }));
 
 // Refresh token
-router.post('/refresh', asyncHandler(async (req, res) => {
+router.post('/refresh', asyncHandler(async (req, res: Response) => {
   const { refreshToken } = req.body;
   
   if (!refreshToken) {
@@ -294,7 +294,7 @@ router.post('/refresh', asyncHandler(async (req, res) => {
 }));
 
 // Forgot password
-router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (req, res) => {
+router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (req, res: Response) => {
   const { email } = req.body;
   
   if (!email) {
@@ -325,7 +325,7 @@ router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (r
 }));
 
 // Reset password
-router.post('/reset-password', authRateLimiterMiddleware, asyncHandler(async (req, res) => {
+router.post('/reset-password', authRateLimiterMiddleware, asyncHandler(async (req, res: Response) => {
   const { token, newPassword } = req.body;
   
   if (!token || !newPassword) {

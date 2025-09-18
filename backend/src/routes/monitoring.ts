@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import { getPrismaClient } from '../services/database';
@@ -6,7 +6,7 @@ import { getPrismaClient } from '../services/database';
 const router = express.Router();
 
 // Get monitoring zones
-router.get('/zones', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/zones', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
@@ -34,7 +34,7 @@ router.get('/zones', authenticateToken, asyncHandler(async (req: AuthRequest, re
 }));
 
 // Get detections
-router.get('/detections', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/detections', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const { page = 1, limit = 10, type } = req.query;
 

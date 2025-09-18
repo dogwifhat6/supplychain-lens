@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import { getPrismaClient } from '../services/database';
@@ -6,7 +6,7 @@ import { getPrismaClient } from '../services/database';
 const router = express.Router();
 
 // Get alerts
-router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
   const { page = 1, limit = 10, isRead } = req.query;
@@ -48,7 +48,7 @@ router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) =>
 }));
 
 // Mark alert as read
-router.patch('/:alertId/read', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.patch('/:alertId/read', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { alertId } = req.params;
   const userId = req.user!.id;
   const prisma = getPrismaClient();

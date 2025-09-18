@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { getPrismaClient } from '../services/database';
 import { authenticateToken, requireRole, AuthRequest } from '../middleware/auth';
@@ -11,7 +11,7 @@ router.post('/', authenticateToken, [
   body('name').trim().isLength({ min: 1 }).withMessage('Organization name is required'),
   body('description').optional().trim(),
   body('industry').optional().trim()
-], asyncHandler(async (req: AuthRequest, res) => {
+], asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -46,7 +46,7 @@ router.post('/', authenticateToken, [
 }));
 
 // Get user's organizations
-router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
@@ -67,7 +67,7 @@ router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) =>
 }));
 
 // Get organization details
-router.get('/:organizationId', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/:organizationId', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const { organizationId } = req.params;
   const userId = req.user!.id;
@@ -114,7 +114,7 @@ router.put('/:organizationId', authenticateToken, [
   body('name').optional().trim().isLength({ min: 1 }),
   body('description').optional().trim(),
   body('industry').optional().trim()
-], asyncHandler(async (req: AuthRequest, res) => {
+], asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -159,7 +159,7 @@ router.put('/:organizationId', authenticateToken, [
 router.post('/:organizationId/users', authenticateToken, [
   body('email').isEmail().normalizeEmail(),
   body('role').isIn(['MEMBER', 'VIEWER']).withMessage('Invalid role')
-], asyncHandler(async (req: AuthRequest, res) => {
+], asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -234,7 +234,7 @@ router.post('/:organizationId/users', authenticateToken, [
 }));
 
 // Get organization users
-router.get('/:organizationId/users', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/:organizationId/users', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { organizationId } = req.params;
   const userId = req.user!.id;
   const prisma = getPrismaClient();
@@ -272,7 +272,7 @@ router.get('/:organizationId/users', authenticateToken, asyncHandler(async (req:
 
   res.json({
     success: true,
-    data: users.map(orgUser => ({
+    data: users.map((orgUser: any) => ({
       ...orgUser.user,
       role: orgUser.role,
       joinedAt: orgUser.joinedAt

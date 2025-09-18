@@ -13,7 +13,7 @@ router.post('/', authenticateToken, [
   body('industry').optional().trim(),
   body('coordinates').optional().isObject(),
   body('organizationId').isUUID().withMessage('Valid organization ID is required')
-], asyncHandler(async (req: AuthRequest, res) => {
+], asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);

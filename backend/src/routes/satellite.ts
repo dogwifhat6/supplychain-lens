@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
 import { getPrismaClient } from '../services/database';
@@ -6,7 +6,7 @@ import { getPrismaClient } from '../services/database';
 const router = express.Router();
 
 // Get satellite data
-router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const { supplierId, page = 1, limit = 10 } = req.query;
 

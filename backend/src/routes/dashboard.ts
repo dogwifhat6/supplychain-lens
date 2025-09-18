@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { getPrismaClient } from '../services/database';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../middleware/errorHandler';
@@ -7,7 +7,7 @@ import { logger } from '../utils/logger';
 const router = express.Router();
 
 // Get dashboard overview
-router.get('/overview', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/overview', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
   const organizationId = req.user!.organizationId;
@@ -190,7 +190,7 @@ router.get('/overview', authenticateToken, asyncHandler(async (req: AuthRequest,
 }));
 
 // Get monitoring zones summary
-router.get('/monitoring-zones', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/monitoring-zones', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
@@ -218,7 +218,7 @@ router.get('/monitoring-zones', authenticateToken, asyncHandler(async (req: Auth
 }));
 
 // Get suppliers summary
-router.get('/suppliers', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/suppliers', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
@@ -264,7 +264,7 @@ router.get('/suppliers', authenticateToken, asyncHandler(async (req: AuthRequest
 }));
 
 // Get risk distribution
-router.get('/risk-distribution', authenticateToken, asyncHandler(async (req: AuthRequest, res) => {
+router.get('/risk-distribution', authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
   const prisma = getPrismaClient();
   const userId = req.user!.id;
 
