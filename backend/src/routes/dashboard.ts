@@ -295,21 +295,21 @@ router.get('/risk-distribution', authenticateToken, asyncHandler(async (req: Aut
   });
 
   // Risk by level
-  const byLevel = suppliers.reduce((acc, supplier) => {
+  const byLevel = suppliers.reduce((acc: Record<string, number>, supplier: any) => {
     acc[supplier.riskLevel] = (acc[supplier.riskLevel] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   // Risk by type
-  const byType = suppliers.reduce((acc, supplier) => {
-    supplier.riskAssessments.forEach(assessment => {
+  const byType = suppliers.reduce((acc: Record<string, number>, supplier: any) => {
+    supplier.riskAssessments.forEach((assessment: any) => {
       acc[assessment.type] = (acc[assessment.type] || 0) + 1;
     });
     return acc;
   }, {} as Record<string, number>);
 
   // Risk by country
-  const byCountry = suppliers.reduce((acc, supplier) => {
+  const byCountry = suppliers.reduce((acc: Record<string, number>, supplier: any) => {
     acc[supplier.country] = (acc[supplier.country] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

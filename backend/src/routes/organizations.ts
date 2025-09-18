@@ -59,7 +59,7 @@ router.get('/', authenticateToken, asyncHandler(async (req: AuthRequest, res: Re
 
   res.json({
     success: true,
-    data: organizations.map(org => ({
+    data: organizations.map((org: any) => ({
       ...org.organization,
       role: org.role
     }))

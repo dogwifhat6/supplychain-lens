@@ -24,7 +24,7 @@ const loginValidation = [
 ];
 
 // Register new user
-router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHandler(async (req, res: Response) => {
+router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHandler(async (req: any, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -71,7 +71,7 @@ router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHan
   const token = jwt.sign(
     { userId: user.id, email: user.email },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string }
   );
 
   // Create session
@@ -100,7 +100,7 @@ router.post('/register', authRateLimiterMiddleware, registerValidation, asyncHan
 }));
 
 // Login user
-router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(async (req, res: Response) => {
+router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(async (req: any, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new CustomError('Validation failed', 400);
@@ -149,7 +149,7 @@ router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(a
   const token = jwt.sign(
     { userId: user.id, email: user.email },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string }
   );
 
   // Create session
@@ -181,7 +181,7 @@ router.post('/login', authRateLimiterMiddleware, loginValidation, asyncHandler(a
 }));
 
 // Logout user
-router.post('/logout', asyncHandler(async (req, res: Response) => {
+router.post('/logout', asyncHandler(async (req: any, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (token) {
@@ -200,7 +200,7 @@ router.post('/logout', asyncHandler(async (req, res: Response) => {
 }));
 
 // Get current user
-router.get('/me', asyncHandler(async (req, res: Response) => {
+router.get('/me', asyncHandler(async (req: any, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (!token) {
@@ -248,7 +248,7 @@ router.get('/me', asyncHandler(async (req, res: Response) => {
 }));
 
 // Refresh token
-router.post('/refresh', asyncHandler(async (req, res: Response) => {
+router.post('/refresh', asyncHandler(async (req: any, res: Response) => {
   const { refreshToken } = req.body;
   
   if (!refreshToken) {
@@ -272,7 +272,7 @@ router.post('/refresh', asyncHandler(async (req, res: Response) => {
   const newToken = jwt.sign(
     { userId: user.id, email: user.email },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string }
   );
 
   // Update session
@@ -294,7 +294,7 @@ router.post('/refresh', asyncHandler(async (req, res: Response) => {
 }));
 
 // Forgot password
-router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (req, res: Response) => {
+router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (req: any, res: Response) => {
   const { email } = req.body;
   
   if (!email) {
@@ -325,7 +325,7 @@ router.post('/forgot-password', authRateLimiterMiddleware, asyncHandler(async (r
 }));
 
 // Reset password
-router.post('/reset-password', authRateLimiterMiddleware, asyncHandler(async (req, res: Response) => {
+router.post('/reset-password', authRateLimiterMiddleware, asyncHandler(async (req: any, res: Response) => {
   const { token, newPassword } = req.body;
   
   if (!token || !newPassword) {
