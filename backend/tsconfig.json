@@ -14,7 +14,6 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noImplicitReturns": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "forceConsistentCasingInFileNames": true,
