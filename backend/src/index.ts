@@ -90,11 +90,32 @@ app.use(rateLimiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  try {
+    logger.info('Health check requested');
+    res.status(200).json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      port: PORT,
+      pid: process.pid
+    });
+  } catch (error) {
+    logger.error('Health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Simple root endpoint for basic connectivity test
+app.get('/', (req, res) => {
   res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    message: 'SupplyChainLens Backend API',
+    status: 'running',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -159,10 +180,20 @@ async function initializeApp() {
     }
     
     // Start server
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       logger.info(`🚀 SupplyChainLens Backend running on port ${PORT}`);
       logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+      logger.info(`🔗 Health check available at: http://0.0.0.0:${PORT}/health`);
+    });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      logger.error('Server error:', error);
+      if (error.code === 'EADDRINUSE') {
+        logger.error(`Port ${PORT} is already in use`);
+      }
+      process.exit(1);
     });
     
   } catch (error) {
@@ -200,6 +231,12 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Start the application
+logger.info('Starting SupplyChainLens Backend...');
+logger.info(`Node version: ${process.version}`);
+logger.info(`Platform: ${process.platform}`);
+logger.info(`Architecture: ${process.arch}`);
+logger.info(`Memory usage: ${JSON.stringify(process.memoryUsage())}`);
+
 initializeApp();
 
 export { app, io };
