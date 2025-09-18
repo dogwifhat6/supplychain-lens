@@ -27,6 +27,9 @@ RUN npm install
 WORKDIR /app
 COPY . .
 
+# Make startup script executable
+RUN chmod +x /app/start.sh
+
 # Build frontend
 RUN npm run build
 
@@ -54,4 +57,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-CMD ["/app/start.sh"]
+CMD ["sh", "-c", "cd /app/backend && node dist/index.js"]
